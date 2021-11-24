@@ -39,8 +39,21 @@ const connect = async () => {
 
 connect()
 
-app.get('/' ,(req ,res) => {
-
+app.get('/:urlId' ,async (req ,res) => {
+    const urlId = req.params.urlId
+    const server = hashRing.get(urlId)
+    const result = await clients[server].query("SELECT * FROM urls WHERE  url_id = $1" ,[urlId])
+    if (result.rowCount > 0) {
+        res.send({
+            'message': "found data",
+            'data': {...result.rows['0']}
+        })
+    } else {
+        res.send({
+            'message': "No result",
+            'data': []
+        })
+    }
 })
 
 app.post('/' ,async (req ,res) => {
